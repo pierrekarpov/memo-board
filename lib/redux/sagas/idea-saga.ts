@@ -11,6 +11,9 @@ import {
     IDEAS_DELETE_REQUEST,
     IDEAS_DELETE_SUCCESS,
     IDEAS_DELETE_FAIL,
+    IDEAS_UPDATE_REQUEST,
+    IDEAS_UPDATE_SUCCESS,
+    IDEAS_UPDATE_FAIL,
 } from '@lib/redux/actions';
 
 import { call, put, takeLatest } from 'redux-saga/effects';
@@ -100,11 +103,44 @@ const deleteIdeaSaga = function* (action: Action): any {
     }
 };
 
+const updateIdeaSaga = function* (action: Action): any {
+    try {
+        const { id: updatedId } = action.payload.params
+        const { title, body } = action.payload.data
+
+        const savedIdeas = JSON.parse(localStorage.getItem(KEY) as string)
+        let updatedIdea: any = {}
+        const newIdeas = _.map(savedIdeas, idea => {
+            if (idea.id == updatedId) {
+                updatedIdea = {
+                    ...idea,
+                    title,
+                    body
+
+                }
+                return updatedIdea
+            }
+            return idea
+        })
+
+        localStorage.setItem(KEY, JSON.stringify(newIdeas))
+        const response = updatedIdea
+        yield put({
+            type: IDEAS_UPDATE_SUCCESS, response
+        });
+        return response;
+    } catch (e) {
+        console.error(e)
+        yield put({ type: IDEAS_UPDATE_FAIL, response: e });
+    }
+};
+
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default [
     takeLatest(IDEAS_FETCH_REQUEST, getIdeaSaga),
     takeLatest(IDEAS_UPLOAD_REQUEST, createIdeaSaga),
     takeLatest(IDEAS_DELETE_REQUEST, deleteIdeaSaga),
+    takeLatest(IDEAS_UPDATE_REQUEST, updateIdeaSaga),
 
 ]

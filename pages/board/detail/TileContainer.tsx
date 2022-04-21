@@ -8,21 +8,21 @@ import Typography from '@mui/material/Typography'
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton'
 import { makeStyles, propsToClassKey } from '@mui/styles'
+import TextField from '@mui/material/TextField';
 
 const useStyles = makeStyles((theme: any) => ({
     tile: {
         width: '150px',
         margin: '10px',
-        border: '1px solid red',
+        // border: '1px solid red',
+        backgroundColor: '#eee',
         '&:hover': {
-            border: '1px solid blue'
+            border: '1px solid #aaa'
         },
     },
-    deleteButton: {
-        // display: 'none',
-        '&:hover': {
-            display: 'inline'
-        }
+    deleteButtonContainer: {
+        // marginRight: '25px',
+        border: '1px solid black'
     }
 }))
 
@@ -32,16 +32,21 @@ interface TileContainerProps {
     body: string,
     isFocused: boolean,
     deleteIdea: (id: number) => void
+    saveIdea: (id: number, title: string, body: string) => void
 }
 const TileContainer = ({
     id,
-    title,
-    body,
+    title: inputTitle,
+    body: inputBody,
     isFocused,
     deleteIdea,
+    saveIdea,
 }: TileContainerProps) => {
     const classes = useStyles()
     const [hover, setHover] = useState(false);
+    const [dirty, setDirty] = useState(false);
+    const [title, setTitle] = useState(inputTitle);
+    const [body, setBody] = useState(inputBody);
     // const [statusDict, setStatusDict] = useState<any>(inputStatusDict)
     // const [isDirty, setIsDirty] = useState<boolean>(false)
     // const [isPublishAllowed, setIsPublishAllowed] = useState<boolean>(inputIsPublishAllowed)
@@ -50,11 +55,13 @@ const TileContainer = ({
     // const strTemplateSetSceneCombinations = _.map(isStatic ? StaticTemplateSetSceneCombinations : TemplateSetSceneCombinations, (c) => c.join('_'))
 
 
-    // useEffect(() => {
-    //     if (inputStatusDict) {
-    //         setStatusDict(inputStatusDict)
-    //     }
-    // }, [inputStatusDict])
+    useEffect(() => {
+        console.log('id', id, 'hover', hover)
+        if (!hover && dirty) {
+            console.log("NEED TO SAVE AND SET AS NOT DIRTY ANYMORE")
+            saveIdea(id, title, body)
+        }
+    }, [hover])
 
     // useEffect(() => {
     //     setIsPublishAllowed(inputIsPublishAllowed)
@@ -76,31 +83,70 @@ const TileContainer = ({
     //     setIsDirty(false)
     // }
 
-    // const handlePublish = () => {
-    //     onSave(statusDict)
-    // }
+    const handleTitleChange = (e: any) => {
+        console.log('===')
+        console.log(e)
+        console.log('===')
+        setDirty(true)
+        setTitle(e.target.value)
+    }
+
+    const handleBodyChange = (e: any) => {
+        console.log('===')
+        console.log(e)
+        console.log('===')
+        setDirty(true)
+        setBody(e.target.value)
+    }
 
     return (
-        <Grid container direction="column" spacing={3} className={classes.tile} onMouseOver={() => setHover(true)}
+        <Grid container direction="column" alignItems="stretch" alignContent="space-between" className={classes.tile} onMouseOver={() => setHover(true)}
             onMouseOut={() => setHover(false)}>
-            {hover && <IconButton
-                className={classes.deleteButton}
-                size="small"
-                color="primary"
-                aria-label="remove idea"
-                onClick={() => {
-                    deleteIdea(id)
-                }}
-            >
-                <DeleteIcon />
-            </IconButton>}
-            <Grid item>id {id}</Grid>
-            <Grid item>title {title}</Grid>
-            <Grid item>body {body}</Grid>
+            <Grid item>
+                <Grid container direction="row" alignContent='space-between'>
+                    <Grid alignSelf="flex-start" item sm={9}>id {id}</Grid>
+                    {hover &&
+                        <Grid item sm={3}>
+                            <IconButton
+                                className={classes.deleteButtonContainer}
+                                size="small"
+                                color="primary"
+                                aria-label="remove idea"
+                                onClick={() => {
+                                    deleteIdea(id)
+                                }}
+                            >
+                                <DeleteIcon />
+                            </IconButton>
+                        </Grid>}
+
+                </Grid>
+
+            </Grid>
+
+
+            <Grid item >
+                <TextField
+                    label="Title"
+                    variant="filled"
+                    size="small"
+                    value={title}
+                    onChange={handleTitleChange}
+                    fullWidth />
+            </Grid>
+            <Grid item>
+                <TextField
+                    label="Body"
+                    variant="filled"
+                    size="small"
+                    value={body}
+                    onChange={handleBodyChange}
+                    fullWidth />
+            </Grid>
 
 
 
-        </Grid>
+        </Grid >
     )
 }
 

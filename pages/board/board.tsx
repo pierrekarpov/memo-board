@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 import { makeStyles } from '@mui/styles'
-import { IDEAS_FETCH_REQUEST, IDEAS_UPLOAD_REQUEST, IDEAS_DELETE_REQUEST } from '@lib/redux/actions'
+import { IDEAS_FETCH_REQUEST, IDEAS_UPLOAD_REQUEST, IDEAS_DELETE_REQUEST, IDEAS_UPDATE_REQUEST } from '@lib/redux/actions'
 import { connect } from 'react-redux'
 
 import React, { useEffect, useState } from 'react'
@@ -34,6 +34,7 @@ interface BoardProps {
     getIdeas: () => void
     createIdea: () => void
     deleteIdea: (id: number) => void
+    updateIdea: (id: number, title: string, body: string) => void
 }
 
 const Board = (props: BoardProps) => {
@@ -66,6 +67,10 @@ const Board = (props: BoardProps) => {
         props.deleteIdea(id)
     }
 
+    const updateIdea = (id: number, title: string, body: string) => {
+        props.updateIdea(id, title, body)
+    }
+
 
     return (
         <Container className={classes.cardGrid}>
@@ -80,7 +85,7 @@ const Board = (props: BoardProps) => {
                         {_.map(currentIdeas, (idea: any) => {
                             return (
                                 <Grid item>
-                                    <TileContainer id={idea.id} title={idea.title} body={idea.body} isFocused={false} deleteIdea={deleteIdea} />
+                                    <TileContainer id={idea.id} title={idea.title} body={idea.body} isFocused={false} deleteIdea={deleteIdea} saveIdea={updateIdea} />
                                 </Grid>
                                 // <Grid item className={classes.tile}>{JSON.stringify(idea)}</Grid>
                             )
@@ -123,6 +128,14 @@ const mapDispatchToProps = (dispatch: any) => {
                 type: IDEAS_DELETE_REQUEST,
                 payload: {
                     params: { id },
+                },
+            }),
+        updateIdea: (id: number, title: string, body: string) =>
+            dispatch({
+                type: IDEAS_UPDATE_REQUEST,
+                payload: {
+                    params: { id },
+                    data: { title, body }
                 },
             }),
 
