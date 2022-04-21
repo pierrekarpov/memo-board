@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme: any) => ({
 interface BoardProps {
     isLoading: boolean
     ideas: any[]
-    idea?: number
+    newIdea?: any
     getIdeas: () => void
     createIdea: () => void
     deleteIdea: (id: number) => void
@@ -48,16 +48,22 @@ const Board = (props: BoardProps) => {
         props.getIdeas()
     }, [])
 
+    useEffect(() => {
+        if (_.isEmpty(props.ideas)) return
+        initIdeas(props.ideas)
+    }, [props.ideas])
+
+    useEffect(() => {
+        console.log('props.newIdea', props.newIdea)
+    }, [props.newIdea])
+
     const initIdeas = (inputIdeas: any[]) => {
         console.log('inputIdeas', inputIdeas)
 
         setCurrentIdeas(inputIdeas)
     }
 
-    useEffect(() => {
-        if (_.isEmpty(props.ideas)) return
-        initIdeas(props.ideas)
-    }, [props.ideas])
+
 
     const createIdea = () => {
         props.createIdea()
@@ -85,7 +91,7 @@ const Board = (props: BoardProps) => {
                         {_.map(currentIdeas, (idea: any) => {
                             return (
                                 <Grid item>
-                                    <TileContainer id={idea.id} title={idea.title} body={idea.body} isFocused={false} deleteIdea={deleteIdea} saveIdea={updateIdea} />
+                                    <TileContainer id={idea.id} title={idea.title} body={idea.body} isFocused={props.newIdea && props.newIdea.id == idea.id} deleteIdea={deleteIdea} saveIdea={updateIdea} />
                                 </Grid>
                                 // <Grid item className={classes.tile}>{JSON.stringify(idea)}</Grid>
                             )

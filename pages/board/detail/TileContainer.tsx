@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import * as _ from 'lodash'
 
 import Switch from '@mui/material/Switch';
@@ -43,6 +43,7 @@ const TileContainer = ({
     saveIdea,
 }: TileContainerProps) => {
     const classes = useStyles()
+    const inputReference = useRef(null);
     const [hover, setHover] = useState(false);
     const [dirty, setDirty] = useState(false);
     const [title, setTitle] = useState(inputTitle);
@@ -54,6 +55,18 @@ const TileContainer = ({
 
     // const strTemplateSetSceneCombinations = _.map(isStatic ? StaticTemplateSetSceneCombinations : TemplateSetSceneCombinations, (c) => c.join('_'))
 
+
+    useEffect(() => {
+        if (isFocused && inputReference && inputReference.current) {
+            (inputReference as any).current.focus()
+            // const timeout = setTimeout(() => {
+            //     inputReference.current.click();
+            // }, 100);
+            // return () => {
+            //     clearTimeout(timeout);
+            // };
+        }
+    }, [isFocused, inputReference])
 
     useEffect(() => {
         console.log('id', id, 'hover', hover)
@@ -100,8 +113,17 @@ const TileContainer = ({
     }
 
     return (
-        <Grid container direction="column" alignItems="stretch" alignContent="space-between" className={classes.tile} onMouseOver={() => setHover(true)}
-            onMouseOut={() => setHover(false)}>
+        <Grid
+            container
+            direction="column"
+            alignItems="stretch"
+            alignContent="space-between"
+            className={classes.tile}
+            onMouseOver={() => setHover(true)}
+            onMouseOut={() => setHover(false)}
+            style={isFocused ? { border: '1px solid #1976d2' } : {}}
+        >
+
             <Grid item>
                 <Grid container direction="row" alignContent='space-between'>
                     <Grid alignSelf="flex-start" item sm={9}>id {id}</Grid>
@@ -136,11 +158,13 @@ const TileContainer = ({
             </Grid>
             <Grid item>
                 <TextField
+                    ref={inputReference}
                     label="Body"
                     variant="filled"
                     size="small"
                     value={body}
                     onChange={handleBodyChange}
+                    focused={isFocused}
                     fullWidth />
             </Grid>
 
